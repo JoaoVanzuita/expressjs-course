@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  expressjs-course-server:
+    container_name: expressjs-course-server
+    image: node:alpine
+    working_dir: /app
+    command: >
+      sh -c "npm install && npm run start:dev"
+    volumes:
+      - .:/app
+    ports:
+      - '8080:8080'
+    links:
+      - expressjs_course_db
+    depends_on:
+      - expressjs_course_db
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+  expressjs_course_db:
+    container_name: expressjs_course_db
+    image: mongo
+    volumes:
+      - mongodb_data_container:/data/db
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_DATABASE=${DB_NAME}
+
+volumes:
+  mongodb_data_container:

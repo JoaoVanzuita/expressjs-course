@@ -1,8 +1,11 @@
 const express = require('express')
-const groceriesRoute = require('./routes/groceries')
-const marketsRoute = require('./routes/markets')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
+
+const groceriesRouter = require('./routes/groceries')
+const marketsRouter = require('./routes/markets')
+const authRouter = require('./routes/auth')
+require('./database')
 
 const app = express()
 const PORT = 8080
@@ -21,7 +24,16 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use('/api/groceries', groceriesRoute)
-app.use('/api/markets', marketsRoute)
+app.use('/api/auth', authRouter)
+
+app.use((req, res, next) => {
+  if (!req.session.actualUser) {
+    return res.send(401)
+  }
+  next()
+})
+
+app.use('/api/groceries', groceriesRouter)
+app.use('/api/markets', marketsRouter)
 
 app.listen(PORT, () => console.log(`Server Online - Running on Port ${PORT}`))
